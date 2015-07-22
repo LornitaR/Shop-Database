@@ -1,0 +1,129 @@
+CS4416 - Database Systems                               Spring 2015
+
+
+Group members and work done
+Group members:
+Cillian Barron: 1 query, 1 stored procedure, write-up, 
+Joanne Lynch: FDs, 3NF, Entity-Relationship, Triggers
+Lorna Ryan: Schema file, 1 stored procedure, 2 queries, views 
+
+
+
+
+Database Description
+
+    For this project we have created a database representing an online store for bespoke and niche creations. The site itself consists of a number of unique storefronts which can be visited by registered customers, who can then make purchases, and leave reviews if they so wish. In addition to this, the site hopes to offer customers exposure to a selection of goods in their local area through algorithms pairing customer locations to artisan locations. 
+    The database is comprised of six tables which we feel encompass all the required data on our site. The first table, Customers, consists of CustomerID, Name, LocationID, and DateOfBirth. CustomerID is the primary key. It’s is a unique, auto-generated integer to represent each customer. The Name is simply a VarChar that identifies each customer, and will be the moniker by which they are identified by on the site when leaving reviews, etc. The LocationID is a unique integer which determines the user’s address; this is further explained in the Locations table below. The DateOfBirth is a DateTime variable, this is mainly used for statistics, and to ensure all users are over 18 years of age An example of a tuple in this table would be (4321, 'Jane Doe', 1234, '1973-02-05’, 19:05:32').
+    The second table is the Artisan table. Headings here include: ArtisanID, Guild, ShopName, LocationID and Bio. The ArtisanID fulfills the same function as the CustomerID in the above table. Its’ the primary key. Guild is a predetermined VarChar representing the sellers main area of expertise: Metalwork, Pottery, and Textiles are some examples of guilds. The ShopName is simply the title of their shop, it is stored in VarChar format and does not need to be unique. LocationId provides the same function for the artisans as users and is explained further below. The Bio is a short description of the artisans store, their interests, and any other information that they feel is relevant. An example of a tuple in this table would be (4455, 'Woodwork', 'Woodies', 1234, 'Welcome to my page! I specialise in making birdhouses');
+    The third table is the Locations table. It consists of headings including LocationID, StreetName, Town, and County. The LocationID is the primary key and the unique identifier by which the subjects location can be determined. The StreetName, and Town heading represents the specific address of the subject. They are stored as VarChars and there is no requirement for them to be unique. Counties are unique VarChars. This database is currently for Ireland only, but could be expanded, so there could be multiple instances of the same street name, or town name, which are actually separate places. Such as main street, milltown, Co.Clare, and main street, Milltown, Co.Kerry.
+    The fourth table is the Products table. Headings here include: ProductID, ProductName, ArtisanID, Description, DateAdded, ProductCost, and Quantity. The ProductID is the primary key and unique identifier for each product, it is stored as a VarChar. The ProductName, and Description are VarChars identifying the name and description. DateAdded is a DateTime specifying when the project was added. ProductCost is a double identifying the cost of the product. Quantity is an integer identifying the amount of stock that the Artisan has on hand. AverageRating gives and average of all the ratings recieved for a product. NumberOfReviews gives the totalt number of reviews for a product. An example from the Products table would be (6644, 'Purse', 4455, 5.00, 'Leather purse for women', '2015-05-01 11:12:31', 115).
+    The fifth table is the Purchases table. The headings within this table are: ProductID, CustomerID, PurchaseDate, Quantity, PaymentType. ProductID, CustomerID and PurchaseDate are the candidate keys. ProductID refers to the specific product in the product table. CustomerID refers to the specific customer in the Customer table that purchased the product. DateAdded is the DateTime given to the transaction using the system date. Quantity is an integer representing the number the product bought. TotalCost is a double which depends on the cost from the Products table and the value of the Quantity. PaymentType is a pre-determined string e.g; visa, debit, mastercard. A Purchases example looks like (4321, 9988, '2015-06-01 22:04:10', 3, 'visa')
+    The sixth table is the Review table. Its headings include: CustomerID, ProductID, Date, ReviewText and Rating. CustomerID, ProductID and Date are the candidate keys for this table. The CustomerID refers to the unique customerId from the Customer table. ProductsID refers to the unique productID from the Products table. The Date is the system date upon which the review was created in DateTime. ReviewText is a VarChar(MAX) within which the customer enters their specific review. Rating is simply an integer between 1 and 5; 1 being dissatisfied, 5 being extremely satisfied. A review can only be created if the specific CustomerId matches the ProductID in the Purchases table. You also need the CustomerID, ProductID and specific Date to access the ReviewText and Rating. An example from the Reviews table would be (4321, 9988, '2015-05-01 01:23:14', ‘Excellent quality for great value’, 4)
+
+FD’s for each table
+Customers
+CustomerId > Name, Location,DateOfBirth
+
+Purchases
+ProductID, CustomerID, PurchaseDate >  Quantity, PaymentType
+
+Products
+ProductID > ProductName, ArtisanID, Description, DateAdded,Cost, Quantity
+
+Reviews
+CustomerID, ProductID, Date > ReviewText, Rating
+
+Artisans
+ArtisanID > Guild, ShopName, LocationID, Bio
+
+Locations
+LocationID > StreetName, Town, County
+
+
+
+3NF Justification
+Customers (CustomerID, Name, Location, DOB)
+Primary Key: CustomerID
+FDs: CustomerID > Name, Location, DOB
+C+ = {CNLD} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+Purchases (ProductID, CustomerID, PurchaseDate, Quantity, PaymentType)
+Candidate Key: ProductID, CustomerID, PurchaseDate
+FDs: ProductID, CustomerID, PurchaseDate >  Quantity, PaymentType
+PCD+ = {PCDQT} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+Products (ProductID, ProductName, ArtisanID, Description, DateAdded,Cost, Quantity)
+Primary Key: ProductID
+FDs: ProductID > ProductName, ArtisanID, Description, DateAdded,Cost, Quantity
+P+ = {PNADTCQ} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+Reviews (CustomerID, ProductID, Date, ReviewText, Rating)
+Candidate Key: CustomerID, ProductID, Date
+FDs: CustomerID, ProductID, Date > ReviewText, Rating
+CPD+ = {CPDTR} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+Artisans (ArtisanID, Guild, ShopName, LocationID, Bio)
+Primary Key: ArtisanID 
+FDs: ArtisanID > Guild, ShopName, LocationID, Bio
+A+ = {ASLB} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+Locations (LocationID, StreetName, Town, County)
+Primary Key: LocationID 
+FDs: LocationID > StreetName, Town, County
+L+ = {LSTC} SKK
+The left hand side of the FD is a key since it defines all right hand side attributes, so it is in 3NF.
+
+
+
+Justification of Query Usefulness
+Query 1: Shows the artisans whose products have ratings of more than ⅗. This is useful for a number of reasons. One being in the case of an online store; it would be beneficial to offer a search function that allows users to only view Artisans whose scores are over a certain threshold.
+Query 2: Shows the customer with the highest number of reviews. This would be a very useful query to use in our fictional online store to offer rewards to the person with the highest number of reviews. Such a system would serve to entice people to participate in the review system, thus increasing the number and quality of reviews.
+Query 3: Groups customers by their town if the town has more than 2 people. This would be useful for statistics pages to see what areas of each county has the highest number of customers. This can give artisans a more detailed view of who buys their products, instead of just giving a general number of people per county.
+
+Justification of Views
+View 1: This view groups the artisan’s shop name with the reviews and ratings associated with their products. This could be used to get a better view of the quality of the artisan. They may have one or two 5 star products, but 20 products with ratings of less than 2. In this case, a customer may think they’re dealing with a fantastic artisan if they’re only able to see reviews associated with that one product.
+View 2: This view groups the artisan’s shop name and bio with their addresses so the full location of the shop can be shown. This is useful if the artisan has a shop where customers can visit or collect their items if they live nearby.
+
+
+Analysis of Speed of Queries
+
+Query No.
+Test 1
+Test 2
+Test 3
+AVG
+1
+0.0010 sec
+0.0010 sec
+0.0004 sec
+0.008 sec
+2
+0.003 sec
+0.0019 sec
+0.0003 sec
+0.008 sec
+3
+0.0004 sec
+0.0018 sec
+0.003 sec
+0.008 sec
+
+
+
+
+Justification of Indexes
+    For the purposes of this project we decided to place our indexes in the Reviews, and Purchases tables, specifically using the CustomerID, ProductID and date in the former table, and CustomerID and ProductID in the latter table. These tables were selected as they have the potential to be extremely large tables depending on the success of the site. For the reviews table, the primary key is made up of CustomerID, ProductID and date; so it made sense to place the index here because the ability to quickly search for a customers last review would be very beneficial. For the Purchases table, the same is true, except this index allows us to quickly capture any required information on customers, or the products that they have purchased.  
+
+Justification of Triggers and Stored Procedures/ Functions
+Triggers:
+DeleteArtisan: Upon deletion of an Artisan the trigger will ensure that all associated products and affected product reviews are also deleted. Without this trigger, if Artisan A is deleted, his associated products, and their associated reviews, will still exist. 
+UpdateQuantity: This trigger will lower the product quantity in the Products table by the quantity purchased in the Purchases table. Without this, the Products table would not be updated and issues may arise regarding out of stock items.
+
+Stored Procedures:
+SpecificReview: This procedure will get all of the reviews for the specific product being passed in. This is useful for a website where reviews are shown on the product page so all of the reviews can be accessed easily.
+AddRatings: This procedure will update the products table when a review is added by a customer. It takes the rating given by the customer, adds to the amount of total reviews, and gets the average of all the reviews. This shows the average 5 star rating given when all reviews are combined to give a clear picture of what customers thought of the product.
